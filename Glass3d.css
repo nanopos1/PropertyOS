@@ -1,0 +1,132 @@
+/* PropertyOS · glass3d.css
+   Liquid glass + spatial depth. Load AFTER the inline <style> in index.html.
+   Pure enhancement: removes cleanly by deleting this file and glass3d.js. */
+
+@property --spec{syntax:'<number>';inherits:false;initial-value:0}
+
+/* ---------- tokens (light / dark / manual theme, same pattern as index.html) ---------- */
+:root{--hl:.8;--sh2:rgba(30,50,120,.14);--gs:rgba(255,255,255,.88);--so:.9}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--hl:.3;--sh2:rgba(0,0,0,.4);--gs:rgba(28,34,72,.92);--so:.5}}
+:root[data-theme="dark"]{--hl:.3;--sh2:rgba(0,0,0,.4);--gs:rgba(28,34,72,.92);--so:.5}
+
+/* ---------- the world behind the glass ---------- */
+.bl i{will-change:transform;transition:translate 1.2s cubic-bezier(.2,.8,.2,1)}
+.bl i:nth-child(1){translate:calc(var(--px,0)*-22px) calc(var(--py,0)*-16px)}
+.bl i:nth-child(2){translate:calc(var(--px,0)*30px) calc(var(--py,0)*-20px)}
+.bl i:nth-child(3){translate:calc(var(--px,0)*-14px) calc(var(--py,0)*26px)}
+
+/* Glass spheres: sharper objects so the blur has something to bend */
+.bl b{position:absolute;border-radius:50%;pointer-events:none;opacity:var(--so);
+  box-shadow:inset -14px -20px 44px rgba(0,0,50,.28),inset 10px 12px 30px rgba(255,255,255,.4),0 30px 60px -20px rgba(20,30,90,.35);
+  animation:bob var(--d,18s) ease-in-out infinite alternate;
+  translate:calc(var(--px,0)*var(--k,18)*1px) calc(var(--py,0)*var(--k,18)*1px);
+  transition:translate 1.2s cubic-bezier(.2,.8,.2,1)}
+.bl .b1{width:24vmin;height:24vmin;left:62%;top:12%;--k:-34;--d:19s;
+  background:radial-gradient(circle at 30% 26%,#fff 0,rgba(255,255,255,.4) 14%,#8fc4ff 44%,#2f6fe0 100%)}
+.bl .b2{width:32vmin;height:32vmin;left:4%;top:58%;--k:26;--d:23s;
+  background:radial-gradient(circle at 30% 26%,#fff 0,rgba(255,255,255,.4) 14%,#e0b4ff 44%,#8a3fd6 100%)}
+.bl .b3{width:17vmin;height:17vmin;right:9%;bottom:9%;--k:-48;--d:16s;
+  background:radial-gradient(circle at 30% 26%,#fff 0,rgba(255,255,255,.4) 14%,#ffd2b0 44%,#e0683a 100%)}
+@keyframes bob{to{transform:translate3d(0,-38px,0) rotate(10deg)}}
+
+/* ---------- liquid glass surface ---------- */
+.g{
+  backdrop-filter:blur(22px) saturate(1.8) brightness(1.04);
+  -webkit-backdrop-filter:blur(22px) saturate(1.8) brightness(1.04);
+  background-image:
+    radial-gradient(260px circle at var(--mx,50%) var(--my,0%),rgba(255,255,255,calc(var(--spec,0)*.4)),transparent 70%),
+    linear-gradient(150deg,rgba(255,255,255,calc(var(--hl)*.34)) 0%,rgba(255,255,255,calc(var(--hl)*.08)) 26%,rgba(255,255,255,0) 52%,rgba(255,255,255,calc(var(--hl)*.07)) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,var(--hl)),
+    inset 1px 0 0 rgba(255,255,255,calc(var(--hl)*.4)),
+    inset -1px 0 0 rgba(255,255,255,calc(var(--hl)*.2)),
+    inset 0 -1px 0 rgba(255,255,255,calc(var(--hl)*.25)),
+    inset 0 14px 26px -14px rgba(255,255,255,calc(var(--hl)*.55)),
+    inset 0 -16px 26px -16px rgba(0,0,30,.1),
+    0 1px 2px var(--sh2),
+    0 10px 20px -6px var(--sh2),
+    0 28px 56px -14px var(--sh);
+}
+/* many rows on screen: lighter shadow stack to keep scrolling smooth */
+.g.row{box-shadow:inset 0 1px 0 rgba(255,255,255,var(--hl)),inset 0 -1px 0 rgba(255,255,255,calc(var(--hl)*.25)),inset 0 10px 18px -10px rgba(255,255,255,calc(var(--hl)*.4)),0 1px 2px var(--sh2),0 12px 24px -10px var(--sh)}
+
+/* floating header */
+header.g{position:sticky;top:calc(8px + env(safe-area-inset-top,0px));z-index:6;padding:8px 10px;margin:4px 0 18px;border-radius:28px;transition:box-shadow .4s}
+header.g.is-stuck{box-shadow:inset 0 1px 0 rgba(255,255,255,var(--hl)),0 2px 4px var(--sh2),0 18px 40px -10px var(--sh)}
+/* nested backdrop-filters see nothing, so inner pills are tint only */
+header .pill.g{backdrop-filter:none;-webkit-backdrop-filter:none;background-color:var(--fl)}
+
+/* ---------- 3D tilt + specular (driven by glass3d.js) ---------- */
+@media(hover:hover) and (pointer:fine){
+  .v .g{transition:transform .7s cubic-bezier(.2,.9,.3,1),box-shadow .5s,--spec .5s}
+  .v .g.is-tilt{transition:transform .12s ease-out,box-shadow .3s,--spec .25s;--spec:1;
+    transform:perspective(1100px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(-3px) scale(1.008);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,var(--hl)),inset 1px 0 0 rgba(255,255,255,calc(var(--hl)*.4)),
+      inset 0 14px 26px -14px rgba(255,255,255,calc(var(--hl)*.55)),inset 0 -16px 26px -16px rgba(0,0,30,.1),
+      0 2px 4px var(--sh2),0 22px 36px -10px var(--sh2),0 44px 80px -18px var(--sh)}
+  .v .g.is-tilt:active{transform:perspective(1100px) scale(.985)}
+  /* inner content drifts a few px for parallax depth */
+  .v .g .ic,.v .k b,.v .hero h1{translate:calc(var(--tx,0)*5px) calc(var(--ty,0)*5px);transition:translate .4s cubic-bezier(.2,.9,.3,1)}
+}
+
+/* depth-in entrance (replaces the flat slide-up) */
+@keyframes up{from{opacity:0;transform:perspective(900px) translateY(26px) translateZ(-60px) rotateX(8deg) scale(.97);filter:blur(8px)}}
+
+/* ---------- glossy controls ---------- */
+.btn:not(.q):not(.d){background:linear-gradient(180deg,#66b5ff 0%,#0a84ff 52%,#0670e0 100%);
+  box-shadow:inset 0 1.5px 0 rgba(255,255,255,.65),inset 0 -2px 4px rgba(0,40,120,.28),0 1px 2px rgba(10,60,160,.4),0 10px 20px -6px rgba(10,132,255,.6)}
+.btn.d{background:linear-gradient(180deg,#ff7a70 0%,#ef3b30 55%,#d62a20 100%);
+  box-shadow:inset 0 1.5px 0 rgba(255,255,255,.55),inset 0 -2px 4px rgba(120,10,0,.28),0 10px 20px -6px rgba(239,59,48,.55)}
+@media(hover:hover){.btn:hover:not(:active){transform:translateY(-1px);filter:brightness(1.06)}.pill:hover:not(:active){transform:translateY(-1px)}}
+
+.ic{position:relative;box-shadow:inset 0 1.5px 0 rgba(255,255,255,.6),inset 0 -3px 6px rgba(0,0,0,.18),0 8px 16px -6px rgba(0,0,0,.35)}
+.ic::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(180deg,rgba(255,255,255,.4),rgba(255,255,255,0) 52%);pointer-events:none}
+
+.k b{font-variant-numeric:tabular-nums}
+.bars s+s{box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 8px 16px -6px rgba(10,132,255,.6)}
+.ring .p{filter:drop-shadow(0 0 6px rgba(10,132,255,.55))}
+
+/* ---------- navigation: dock + sidebar ---------- */
+.lens{background:linear-gradient(180deg,rgba(255,255,255,calc(var(--hl)*.6)),rgba(255,255,255,calc(var(--hl)*.2)));
+  box-shadow:inset 0 1.5px 0 rgba(255,255,255,var(--hl)),inset 0 -1px 0 rgba(255,255,255,calc(var(--hl)*.3)),inset 0 0 14px rgba(255,255,255,calc(var(--hl)*.35)),0 10px 22px -6px var(--sh);
+  transition:transform .6s cubic-bezier(.3,1.35,.45,1),scale .35s cubic-bezier(.3,1.6,.5,1)}
+nav.tb:active .lens{scale:1.1 1.2}   /* jelly press */
+@media(min-width:900px){
+  aside{border-radius:32px}
+  aside button.on{background:linear-gradient(180deg,rgba(255,255,255,calc(var(--hl)*.5)),rgba(255,255,255,calc(var(--hl)*.18)));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,var(--hl)),inset 0 0 0 1px var(--gb),0 8px 18px -8px var(--sh)}
+  aside button:hover:not(.on){background:rgba(255,255,255,.14)}
+}
+
+/* ---------- overlays ----------
+   The page blur moves to a pseudo-element. A backdrop-filter on .ov/.rcw itself
+   made every glass sheet inside it unable to blur anything (nested backdrop roots). */
+.ov,.rcw{backdrop-filter:none;-webkit-backdrop-filter:none}
+.ov{background:none}.rcw{background:none}
+.ov::before,.rcw::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:rgba(5,10,30,.38);backdrop-filter:blur(14px) saturate(1.3);-webkit-backdrop-filter:blur(14px) saturate(1.3)}
+.rcw::before{position:fixed;background:rgba(5,10,30,.55)}
+@media(min-width:700px){.sh{animation:pop .6s cubic-bezier(.2,1.1,.3,1)}}
+@keyframes pop{from{opacity:0;transform:perspective(1000px) translateY(36px) rotateX(12deg) scale(.94)}}
+@media print{.rcw::before{display:none}}
+
+/* ---------- small screens: keep it cheap ---------- */
+@media(max-width:700px){
+  .bl i{filter:blur(48px)}
+  .bl .b3{display:none}
+  .g{backdrop-filter:blur(18px) saturate(1.7);-webkit-backdrop-filter:blur(18px) saturate(1.7)}
+}
+
+/* ---------- safeguards ---------- */
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .g{background-color:var(--gs)}
+  .ov::before,.rcw::before{background:rgba(5,10,30,.65)}
+}
+@media(prefers-reduced-transparency:reduce){
+  .g{backdrop-filter:none;-webkit-backdrop-filter:none;background-color:var(--gs)}
+  .ov::before,.rcw::before{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(5,10,30,.7)}
+  .bl b{display:none}
+}
+@media(prefers-contrast:more){.g{border-color:var(--tx)}.bl b{display:none}}
+@media(prefers-reduced-motion:reduce){.bl b{animation:none}.bl i,.bl b{translate:none}}
