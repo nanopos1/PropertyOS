@@ -50,7 +50,7 @@ aside button{flex:none;flex-direction:row;font-size:15px;gap:12px;padding:12px 1
 .ts{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:50%;transform:translate(-50%,-120px);z-index:30;padding:12px 20px;border-radius:99px;font-weight:600;transition:transform .5s cubic-bezier(.3,1.5,.5,1)}.ts.on{transform:translate(-50%,0)}
 .em{text-align:center;color:var(--mu);padding:34px 10px}.hero{padding:22px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}.hero h1{font-size:34px}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-</style></head><body><div class="bl"><i></i><i></i><i></i></div>
+</style><link rel="stylesheet" href="glass3d.css"></head><body><div class="bl"><i></i><i></i><i></i></div>
 <aside class="g" id="sd"></aside><div class="app"><header><div class="logo" id="lg"></div><div class="br">PropertyOS</div><div class="sp"></div><button class="pill g" id="scbtn" aria-label="Scan QR" style="padding:9px 11px"></button><button class="pill g" id="sbtn" aria-label="Search" style="padding:9px 11px"></button><button class="pill g" id="rl"></button></header><main id="v" class="v"></main></div>
 <nav class="tb g" id="tb"></nav><div class="ts g" id="ts"></div><div class="gt" id="gate" style="display:flex"></div>
 <script>
@@ -197,4 +197,4 @@ addEventListener('keydown',e=>{if(e.key=='Escape'){const o=[...document.querySel
 new MutationObserver(()=>document.querySelectorAll('[data-a]:not(button):not([tabindex])').forEach(x=>{x.tabIndex=0;x.setAttribute('role','button')})).observe(document.body,{childList:true,subtree:true});
 document.addEventListener('visibilitychange',()=>{if(document.hidden||!ORG)return;if(ist(new Date())!=TD)return location.reload();load().then(render).catch(()=>{})});addEventListener('online',()=>ORG&&load().then(render).catch(()=>{}));
 boot();try{'serviceWorker'in navigator&&location.protocol.startsWith('http')&&navigator.serviceWorker.register('sw.js')}catch(e){}
-</script></body></html>
+</script><script src="glass3d.js"></script></body></html>
